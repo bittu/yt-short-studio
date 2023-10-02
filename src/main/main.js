@@ -1,5 +1,7 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, session, ipcMain } = require('electron');
 const path = require('path');
+const log = require('electron-log')
+const IPC = require('./ipc')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -12,16 +14,29 @@ const createWindow = () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },
   });
 
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    details.responseHeaders['Cross-Origin-Opener-Policy'] = ['same-origin'];
+    details.responseHeaders['Cross-Origin-Embedder-Policy'] = ['require-corp'];
+    // details.responseHeaders['Content-Security-Policy'] = ["default-src 'self'; media-src 'self'"];
+    callback({ responseHeaders: details.responseHeaders });
+  });
+
+  const ipc = new IPC(mainWindow);
+
+  ipcMain.handle('analyse', ipc.getYtBasicInfo)
+  ipcMain.handle('process', ipc.process)
+  ipcMain.handle('getFileBlobData', ipc.getFileBlobData)
+  ipcMain.handle('killProcesses', ipc.killProcesses)
+
+  log.info('Main Window created')
   // and load the index.html of the app.
-  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
-  }
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+
+  log.info('main::', MAIN_WINDOW_WEBPACK_ENTRY)
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
