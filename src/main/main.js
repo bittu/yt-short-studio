@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session, ipcMain } = require('electron');
+const { app, BrowserWindow, session, ipcMain, autoUpdater } = require('electron');
 const path = require('path');
 const log = require('electron-log')
 const IPC = require('./ipc')
@@ -7,6 +7,11 @@ const IPC = require('./ipc')
 if (require('electron-squirrel-startup')) {
   app.quit();
 }
+
+const server = ''
+const url = `${server}/update/${process.platform}/${app.getVersion()}`
+
+autoUpdater.setFeedURL({ url })
 
 const createWindow = () => {
   // Create the browser window.
