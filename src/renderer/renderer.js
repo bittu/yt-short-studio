@@ -77,8 +77,8 @@ function _init() {
     }
   })
 
-  $('#yt-url').val('https://www.youtube.com/watch?v=26GToWd30kM').trigger('change');
-  $('#yt-url').trigger('change')
+  // $('#yt-url').val('https://www.youtube.com/watch?v=26GToWd30kM').trigger('change');
+  // $('#yt-url').trigger('change')
 
   console.log('_init done')
 }
