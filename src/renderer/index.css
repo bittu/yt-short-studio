@@ -107,7 +107,7 @@ main {
   }
 }
 
-.webflow-style-input input {
+.webflow-style-input input[type="text"] {
   flex-grow: 1;
   color: #BFD2FF;
   font-size: 18px;

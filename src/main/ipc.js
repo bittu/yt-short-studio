@@ -66,7 +66,7 @@ class IPC {
     })
   }
 
-  process = async (_event, url) => {
+  process = async (_event, url, watermark) => {
     const that = this
     if (!this.isCacheEnabled()) {
       fsExtra.emptyDirSync(outputFolder)
@@ -101,10 +101,18 @@ class IPC {
         const outputPath = path.join(outputFolder, outputFileName);
         const pid = nanoid.nanoid();
 
+        const videoFilters = ["crop=ih*(9/16):ih"]
+
+        if (watermark) {
+          videoFilters.push(`drawtext=text='pepper pots':x=(W-tw)/2:y=(H-th)/2:
+          fontsize=20:fontcolor=white:
+          shadowcolor=black:shadowx=5:shadowy=5`)
+        }
+
         that.processes[pid] = ffmpeg(filePath)
           .seek(startTime)
           .duration(subclipDuration)
-          .videoFilters(["crop=ih*(9/16):ih"])
+          .videoFilters(videoFilters)
           .output(outputPath)
           .on('start', function(commandLine) {
             log.info('Spawned Ffmpeg with command: ' + commandLine);

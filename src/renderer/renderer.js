@@ -52,7 +52,7 @@ function _init() {
     $('.webflow-style-input').hide();
     $('.pill').show();
     $('#close').show();
-    await window.api.process($('#yt-url').val().trim())
+    await window.api.process($('#yt-url').val().trim(), $('#watermark').is(":checked"))
     $('.pill').hide();
   })
 

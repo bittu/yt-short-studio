@@ -6,7 +6,7 @@ const { contextBridge, ipcRenderer } = require('electron')
 contextBridge.exposeInMainWorld('api', {
   analyse: (url) => ipcRenderer.invoke('analyse', url),
   downloadYt: (url) => ipcRenderer.invoke('downloadYt', url),
-  process: (url) => ipcRenderer.invoke('process', url),
+  process: (url, watermark) => ipcRenderer.invoke('process', url, watermark),
   getFileBlobData: (filePath) => ipcRenderer.invoke('getFileBlobData', filePath),
   killProcesses: (filePath) => ipcRenderer.invoke('killProcesses', filePath),
   setCacheEnabled: (bool) => ipcRenderer.invoke('setCacheEnabled', bool),
