@@ -41,6 +41,11 @@ h1 {
   margin-top: 40px;
   display: flex;
   align-items: center;
+  background: linear-gradient(to right, #B294FF, #57E6E6, #ebeb3b, #57E6E6, #B294FF, #57E6E6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% auto;
+  animation: gradient 3s linear infinite;
 }
 
 @keyframes gradient {
