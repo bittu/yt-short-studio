@@ -9,5 +9,9 @@ contextBridge.exposeInMainWorld('api', {
   process: (url) => ipcRenderer.invoke('process', url),
   getFileBlobData: (filePath) => ipcRenderer.invoke('getFileBlobData', filePath),
   killProcesses: (filePath) => ipcRenderer.invoke('killProcesses', filePath),
-  onUpdateProgress: (callback) => ipcRenderer.on('update-progress', callback)
+  setCacheEnabled: (bool) => ipcRenderer.invoke('setCacheEnabled', bool),
+  isCacheEnabled: () => ipcRenderer.invoke('isCacheEnabled'),
+  deleteCache: () => ipcRenderer.invoke('deleteCache'),
+  onUpdateProgress: (callback) => ipcRenderer.on('update-progress', callback),
+  onCacheEnabled: (callback) => ipcRenderer.on('cache-enabled', callback),
 })

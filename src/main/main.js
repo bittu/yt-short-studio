@@ -62,6 +62,9 @@ const createWindow = () => {
   ipcMain.handle('process', ipc.process)
   ipcMain.handle('getFileBlobData', ipc.getFileBlobData)
   ipcMain.handle('killProcesses', ipc.killProcesses)
+  ipcMain.handle('setCacheEnabled', ipc.setCacheEnabled)
+  ipcMain.handle('isCacheEnabled', ipc.isCacheEnabled)
+  ipcMain.handle('deleteCache', ipc.deleteCache)
 
   log.info('Main Window created')
   // and load the index.html of the app.

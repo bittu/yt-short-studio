@@ -1,6 +1,9 @@
 
 import './index.css';
+import './fontawesome/js/all.min'
 import $ from 'jquery'
+import './menu/menu'
+
 // import log from 'electron-log'
 
 // async function init () {
@@ -19,31 +22,36 @@ function _init() {
   console.log('_init started')
   $('#split-clip__container').empty();
 
-  $('#back').hide();
+  $('#close').hide();
 
   $('#yt-url').on('keyup', () => {
     const val = $('#yt-url').val()
     if (val) {
       $('#yt-url').parent().addClass('input--filled');
       $('#process-btn').removeAttr('disabled');
+      $('#process-btn svg').addClass('fa-beat-fade');
     } else {
       $('#yt-url').parent().removeClass('input--filled');
       $('#process-btn').attr('disabled', true);
+      $('#process-btn svg').removeClass('fa-beat-fade');
     }
   })
 
-  $('#back').on('click', () => {
-    $('#split-clip__container').empty();
+  $('#close').on('click', () => {
+    $('video').each((i, v) => {
+      URL.revokeObjectURL(v.getAttribute('src'))
+    })
+    $('#split-clip__container').empty().hide();
     $('#yt-url').val('');
     $('.webflow-style-input').show();
-    $('#back').hide();
+    $('#close').hide();
     window.api.killProcesses();
   })
 
   $('#process-btn').on('click', async () => {
     $('.webflow-style-input').hide();
     $('.pill').show();
-    $('#back').show();
+    $('#close').show();
     await window.api.process($('#yt-url').val().trim())
     $('.pill').hide();
   })
@@ -51,6 +59,7 @@ function _init() {
   window.api.onUpdateProgress((event, value) => {
     console.log(event, value)
     if (value.type === "progress") {
+      $('#split-clip__container').show();
       console.log(value.log);
       if (value.main) {
         renderSubClip(null, value.main)
@@ -76,7 +85,21 @@ function _init() {
         }
       }
     }
+  });
+
+  window.api.onCacheEnabled((event, value) => {
+    $('#cache-enabled span').text(value ? 'Disable cache' : 'Enable cache')
+  });
+
+  $('#cache-enabled').on('click', () => {
+    window.api.setCacheEnabled($('#cache-enabled span').text() === 'Disable cache' ? false : true)
   })
+  $('#delete-cache').on('click', () => {
+    window.api.deleteCache()
+  })
+
+  $('#cache-enabled span').text(window.api.isCacheEnabled() ? 'Disable cache' : 'Enable cache')
+
 
   // $('#yt-url').val('https://www.youtube.com/watch?v=26GToWd30kM').trigger('change');
   // $('#yt-url').trigger('change')
@@ -97,5 +120,11 @@ async function renderSubClip(name, filePath) {
 }
 
 $(_init)
+
+window.onunload = () => {
+  $('video').each((i, v) => {
+    URL.revokeObjectURL(v.getAttribute('src'))
+  })
+}
 
 console.log('👋 This message is being logged by "renderer.js", included via webpack');

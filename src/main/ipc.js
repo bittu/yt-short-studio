@@ -7,8 +7,12 @@ const { createWriteStream, existsSync, mkdirSync, read } = require('fs')
 const ffmpeg = require('fluent-ffmpeg')
 const fsExtra = require('fs-extra')
 const nanoid = require('nanoid')
+const downloadsFolder = require('downloads-folder');
+const Store = require('electron-store');
 
-const outputFolder = path.join(app.getAppPath(), 'downloads');
+const store = new Store();
+
+const outputFolder = path.join(downloadsFolder(), 'ytshortstudio');
 const subclipDuration = 50;
 
 class IPC {
@@ -16,15 +20,30 @@ class IPC {
     this.mainWindow = mainWindow;
 
     if (!existsSync(outputFolder)) {
-      log.info('main::ipc::outputFolder created', outputFolder)
+      log.info('main::ipc::outputFolder created', outputFolder, this.isCacheEnabled())
       mkdirSync(outputFolder)
     } else {
-      log.info('main::ipc::outputFolder exists', outputFolder)
-      fsExtra.emptyDirSync(outputFolder)
+      log.info('main::ipc::outputFolder exists', outputFolder, this.isCacheEnabled())
+      if (!this.isCacheEnabled()) {
+        fsExtra.emptyDirSync(outputFolder)
+      }
     }
   }
 
   processes = {};
+
+  isCacheEnabled = () => {
+    return store.get('cacheEnabled', true);
+  }
+
+  setCacheEnabled = (event, bool) => {
+    store.set('cacheEnabled', bool);
+    this.mainWindow.webContents.send('cache-enabled', bool)
+  }
+
+  deleteCache = () => {
+    fsExtra.emptyDirSync(outputFolder)
+  }
 
   getYtBasicInfo = async (_event, url) => {
     log.info('main::ipc::getYtBasicInfo', url)
@@ -37,8 +56,8 @@ class IPC {
 
   downloadFromYt = (url) => {
     return new Promise(async (resolve) => {
-      const stream = createWriteStream(path.join(outputFolder, 'video.mp4'));
       const info = await ytdl.getInfo(url)
+      const stream = createWriteStream(path.join(outputFolder, `${info.videoDetails.videoId}.mp4`));
       let format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
       log.info('main::ipc::downloadFromYt::format', format)
       ytdl(url, { format }).pipe(stream);
@@ -48,7 +67,9 @@ class IPC {
 
   process = async (_event, url) => {
     const that = this
-    fsExtra.emptyDirSync(outputFolder)
+    if (!this.isCacheEnabled()) {
+      fsExtra.emptyDirSync(outputFolder)
+    }
     that.killProcesses()
     that.mainWindow.webContents.send('update-progress', {
       type: 'progress',
@@ -75,7 +96,7 @@ class IPC {
       for (let i = 0; i < n; i++) {
         const startTime = i * subclipDuration;
         // const endTime = startTime + subclipDuration;
-        const outputFileName = `subclip_${i + 1}.mp4`;
+        const outputFileName = `${path.basename(filePath, '.mp4')}_subclip_${i + 1}.mp4`;
         const outputPath = path.join(outputFolder, outputFileName);
         const pid = nanoid.nanoid();
 
@@ -138,9 +159,12 @@ class IPC {
   }
 
   killProcesses = () => {
-    Object.keys(this.processes).forEach(pid => {
-      this.processes[pid].kill()
-      delete this.processes[pid]
+    const that = this;
+    Object.keys(that.processes).forEach(pid => {
+      if (that.processes[pid]) {
+        that.processes[pid].kill()
+      }
+      delete that.processes[pid]
     })
   }
 

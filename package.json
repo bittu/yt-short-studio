@@ -41,8 +41,10 @@
     "util": "^0.12.5"
   },
   "dependencies": {
+    "downloads-folder": "^3.0.3",
     "electron-log": "^4.4.8",
     "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^11.1.1",
     "jquery": "^3.7.1",
