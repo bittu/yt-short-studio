@@ -34,7 +34,8 @@ function _init() {
 
   $('#back').on('click', () => {
     $('#split-clip__container').empty();
-    $('#yt-url').show().val('');
+    $('#yt-url').val('');
+    $('.webflow-style-input').show();
     $('#back').hide();
     window.api.killProcesses();
   })
