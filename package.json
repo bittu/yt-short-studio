@@ -5,7 +5,7 @@
   "description": "Youtube short studio",
   "main": ".webpack/main",
   "scripts": {
-    "prestart": "git pull && prestart",
+    "prestart": "git reset --hard && git pull && prestart",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
