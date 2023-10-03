@@ -7,12 +7,13 @@ const { createWriteStream, existsSync, mkdirSync, read } = require('fs')
 const ffmpeg = require('fluent-ffmpeg')
 const fsExtra = require('fs-extra')
 const nanoid = require('nanoid')
-const downloadsFolder = require('downloads-folder');
 const Store = require('electron-store');
+const os = require("os");
 
 const store = new Store();
 
-const outputFolder = path.join(downloadsFolder(), 'ytshortstudio');
+const userHomeDir = os.homedir();
+const outputFolder = path.join(userHomeDir, 'Downloads', 'ytshortstudio');
 const subclipDuration = 50;
 
 class IPC {
