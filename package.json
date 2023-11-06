@@ -48,7 +48,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^11.1.1",
     "jquery": "^3.7.1",
-    "nanoid": "^5.0.1",
+    "nanoid": "^5.0.2",
     "prestart": "^1.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
